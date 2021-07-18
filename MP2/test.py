@@ -17,11 +17,11 @@ class Producer(threading.Thread):
         producer = KafkaProducer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094','b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094','b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094'],
                                  security_protocol="SSL")
 
-        while not self.stop_event.is_set():
-            f = open("short.csv", "r")
-            for line in f:
-                producer.send('my-topic', line.encode('ascii'))
-            time.sleep(1)
+        #while not self.stop_event.is_set():
+        f = open("short.csv", "r")
+        for line in f:
+            producer.send('my-topic', line.encode('ascii'))
+        time.sleep(1)
 
         producer.close()
 
@@ -41,11 +41,11 @@ class Consumer(threading.Thread):
                                  security_protocol="SSL")
         consumer.subscribe(['my-topic'])
 
-        while not self.stop_event.is_set():
-            for message in consumer:
-                print(message)
-                if self.stop_event.is_set():
-                    break
+        #while not self.stop_event.is_set():
+        for message in consumer:
+            print(message)
+            if self.stop_event.is_set():
+                break
 
         consumer.close()
 
