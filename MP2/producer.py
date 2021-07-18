@@ -14,3 +14,4 @@ for line in f:
     time.sleep(5)
 
 f.close()
+producer.close()
