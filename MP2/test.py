@@ -18,8 +18,9 @@ class Producer(threading.Thread):
                                  security_protocol="SSL")
 
         while not self.stop_event.is_set():
-            producer.send('my-topic', b"test")
-            producer.send('my-topic', b"\xc2Hola, mundo!")
+            f = open("short.csv", "r")
+            for line in f:
+                producer.send('my-topic', line.encode('ascii'))
             time.sleep(1)
 
         producer.close()
