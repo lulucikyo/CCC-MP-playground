@@ -56,7 +56,7 @@ def main():
 
         topic = NewTopic(name='my-topic',
                          num_partitions=1,
-                         replication_factor=1)
+                         replication_factor=3)
         admin.create_topics([topic])
     except Exception:
         pass
