@@ -11,7 +11,7 @@ f = open("short.csv", "r")
 for line in f:
     print(line)
     producer.send('my-topic', line.encode('ascii'))
-    time.sleep(5)
+    #time.sleep(5)
 
 f.close()
 producer.close()
