@@ -14,7 +14,7 @@ class Producer(threading.Thread):
         self.stop_event.set()
 
     def run(self):
-        producer = KafkaProducer(bootstrap_servers='b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com')
+        producer = KafkaProducer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com'])
 
         while not self.stop_event.is_set():
             producer.send('my-topic', b"test")
@@ -33,7 +33,7 @@ class Consumer(threading.Thread):
         self.stop_event.set()
 
     def run(self):
-        consumer = KafkaConsumer(bootstrap_servers='b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com',
+        consumer = KafkaConsumer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com'],
                                  auto_offset_reset='earliest',
                                  consumer_timeout_ms=1000)
         consumer.subscribe(['my-topic'])
@@ -50,7 +50,7 @@ class Consumer(threading.Thread):
 def main():
     # Create 'my-topic' Kafka topic
     try:
-        admin = KafkaAdminClient(bootstrap_servers='b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com,b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com')
+        admin = KafkaAdminClient(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com','b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com'])
 
         topic = NewTopic(name='my-topic',
                          num_partitions=1,
