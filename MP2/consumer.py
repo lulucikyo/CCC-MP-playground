@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import threading, time
-
+from json import dumps, loads
 from kafka import KafkaAdminClient, KafkaConsumer, KafkaProducer
 from kafka.admin import NewTopic
 
@@ -9,7 +9,8 @@ consumer = KafkaConsumer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.a
                          enable_auto_commit=True,
                          consumer_timeout_ms=10000,
                          security_protocol="SSL",
-                         group_id = "test-group")
+                         group_id = "test-group",
+                         value_deserializer=lambda x: loads(x.decode('utf-8')))
 consumer.subscribe(['my-topic'])
 
 for message in consumer:
