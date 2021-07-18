@@ -10,7 +10,7 @@ producer = KafkaProducer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.a
 
 f = open("short.csv", "r")
 f.readline()
-for line in enumerate(f):
+for line in f:
     v = line.strip('\n').split(",")
     data = {'DayOfWeek':v[0],
             'FlightDate':v[1],
