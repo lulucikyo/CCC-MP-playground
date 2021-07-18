@@ -20,6 +20,7 @@ class Producer(threading.Thread):
         #while not self.stop_event.is_set():
         f = open("short.csv", "r")
         for line in f:
+            print(line)
             producer.send('my-topic', line.encode('ascii'))
         time.sleep(1)
 
