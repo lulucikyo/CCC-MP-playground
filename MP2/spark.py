@@ -37,7 +37,7 @@ df = spark \
   .readStream \
   .format("kafka") \
   .option("kafka.bootstrap.servers", "b-1.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092") \
-  .option("subscribe", "alldata") \
+  .option("subscribe", "test") \
   .option("startingOffsets", "earliest") \
   .load()
 #.option("kafka.group.id", "str-test") \
@@ -79,14 +79,14 @@ dfq2_1 = dfq2_1.select("*", rank().over(window).alias("rank")) \
         .filter(col("rank")<=10).where(dfq2_1["Origin"].isin('SRQ','CMH','JFK','SEA','BOS'))
 
 query1 = (
-    dfq1_2.writeStream.trigger(processingTime="5 seconds") \
+    dfq1_2.writeStream.trigger(processingTime="1 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
 
 query2 = (
-    dfq1_3.writeStream.trigger(processingTime="5 seconds") \
+    dfq1_3.writeStream.trigger(processingTime="1 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
