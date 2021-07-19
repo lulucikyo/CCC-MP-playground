@@ -64,12 +64,19 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
 df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
+# Question 1.2
 dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
         .limit(10)
+# Question 1.3
 dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
 
+# Question 2.1
+dfq2_1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
+window = Window.partitionBy(dfq2_1["Origin"]).orderBy(dfq2_1["avg(DepDelay)"])
+dfq2_1 = dfq2_1.select("*", rank().over(window).alias("rank")) \
+        .filter(col("rank")<=10).where(dfq2_1["Origin"].isin('SRQ','CMH','JFK','SEA','BOS'))
 
 query1 = (
     dfq1_2.writeStream.trigger(processingTime="5 seconds") \
@@ -85,5 +92,12 @@ query2 = (
     .start()
 )
 
+query3 = (
+    dfq2_1.writeStream.trigger(processingTime="5 seconds") \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
 stop_stream_query(query1, 10)
 stop_stream_query(query2, 10)
+stop_stream_query(query3, 10)
