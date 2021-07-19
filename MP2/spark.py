@@ -47,10 +47,10 @@ df = df.select(col("json.*"))
 
 dfq2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
-        .take(10)
+        .limit(10)
 
 query = (
-    dfq2.writeStream.trigger(processingTime = "1 seconds") \
+    dfq2.writeStream \
     .outputMode("append").option("truncate", "false") \
     .format("console") \
     .start()
