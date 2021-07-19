@@ -17,8 +17,8 @@ spark = SparkSession \
 df = spark \
   .readStream \
   .format("kafka") \
-  .option("kafka.bootstrap.servers", "b-1.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092") \
-  .option("subscribe", "my-topic") \
+  .option("kafka.bootstrap.servers", "b-1.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092") \
+  .option("subscribe", "test") \
   .option("startingOffsets", "earliest") \
   .load()
 #.option("kafka.group.id", "str-test") \
@@ -57,4 +57,4 @@ query = (
 )
 
 
-query.awaitTermination()
+query.awaitTermination(5)
