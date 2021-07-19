@@ -15,7 +15,7 @@ spark = SparkSession \
 df = spark \
   .readStream \
   .format("kafka") \
-  .option("kafka.bootstrap.servers", "b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094,b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094,b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094") \
+  .option("kafka.bootstrap.servers", "b-1.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-1.5xqfr1.c3.kafka.us-east-1.amazonaws.com:9092") \
   .option("subscribe", "my-topic") \
   .option("startingOffsets", "earliest") \
   .load()
