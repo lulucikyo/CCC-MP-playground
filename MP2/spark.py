@@ -39,7 +39,7 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
                     StructField("DepDelay", StringType(), True),
                     StructField("CRSArrTime", StringType(), True),
                     StructField("ArrTime", StringType(), True),
-                    StructField("ArrDelay", DoubleType(), True)
+                    StructField("ArrDelay", StringType(), True)
                     ])
 
 df = df.select(from_json(df.value, schema).alias("json"))
