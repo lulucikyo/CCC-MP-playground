@@ -108,8 +108,7 @@ query3 = (
 
 # Question 2.4
 dfq2_4 = df.groupby("Origin", "Dest").agg(mean("ArrDelay")) \
-            .filter(concat(col("Origin"),col("Dest")) \
-            .isin("LGABOS","BOSLGA","OKCDFW","MSPATL")).show()
+            .filter(concat(col("Origin"),col("Dest")).isin("LGABOS","BOSLGA","OKCDFW","MSPATL"))
 query5 = (
     dfq2_4.writeStream.trigger(processingTime="5 seconds") \
     .outputMode("complete").option("truncate", "false") \
