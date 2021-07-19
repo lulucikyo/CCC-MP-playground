@@ -9,6 +9,9 @@ producer = KafkaProducer(bootstrap_servers=['b-1.mp2-1.5xqfr1.c3.kafka.us-east-1
 
 f = open("short.csv", "r")
 f.readline()
+
+count = 0
+
 for line in f:
     v = line.strip('\n').split(",")
     data = {'DayOfWeek':v[0],
@@ -24,6 +27,9 @@ for line in f:
             'ArrTime':v[10],
             'ArrDelay':v[11]}
     producer.send('my-topic', value = data)
+    count += 1
+    if count % 10==0:
+        print("Sent {} records".format(count))
     #time.sleep(5)
 
 f.close()

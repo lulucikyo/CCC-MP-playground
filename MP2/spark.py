@@ -39,17 +39,23 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
                     StructField("DepDelay", StringType(), True),
                     StructField("CRSArrTime", StringType(), True),
                     StructField("ArrTime", StringType(), True),
-                    StructField("ArrDelay", StringType(), True)
+                    StructField("ArrDelay", DoubleType(), True)
                     ])
 
 df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
+dfq2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
+        .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
+        .take(10)
+
 query = (
-    df.writeStream.trigger(processingTime = "1 seconds") \
+    dfq2.writeStream.trigger(processingTime = "1 seconds") \
     .outputMode("append").option("truncate", "false") \
     .format("console") \
     .start()
 )
+
+
 
 query.awaitTermination()
