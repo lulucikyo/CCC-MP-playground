@@ -4,7 +4,7 @@ import pyspark
 
 from pyspark.sql import *
 from pyspark.sql.types import *
-from pyspark.sql.functions import from_json
+from pyspark.sql.functions import *
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
 findspark.init()
@@ -28,7 +28,7 @@ df.printSchema()
 
 df = df.selectExpr("CAST(value AS STRING)")
 
-schema = StructType([StructField("DayofWeek", StringType(), True),
+schema = StructType([StructField("DayOfWeek", StringType(), True),
                     StructField("FlightDate", StringType(), True),
                     StructField("UniqueCarrier", StringType(), True),
                     StructField("FlightNum", StringType(), True),
@@ -43,6 +43,7 @@ schema = StructType([StructField("DayofWeek", StringType(), True),
                     ])
 
 df = df.select(from_json(df.value, schema).alias("json"))
+df = df.select(col("json.*"))
 
 query = (
     df.writeStream.trigger(processingTime = "1 seconds") \
