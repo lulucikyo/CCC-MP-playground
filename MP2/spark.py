@@ -68,15 +68,6 @@ df = df.select(col("json.*"))
 dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
         .limit(10)
-# Question 1.3
-dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
-        .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
-
-# Question 2.1
-dfq2_1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
-window = Window.partitionBy(dfq2_1["Origin"]).orderBy(dfq2_1["avg(DepDelay)"])
-dfq2_1 = dfq2_1.select("*", rank().over(window).alias("rank")) \
-        .filter(col("rank")<=10).where(dfq2_1["Origin"].isin('SRQ','CMH','JFK','SEA','BOS'))
 
 query1 = (
     dfq1_2.writeStream.trigger(processingTime="1 seconds") \
@@ -85,12 +76,23 @@ query1 = (
     .start()
 )
 
+# Question 1.3
+dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
+        .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
+
 query2 = (
     dfq1_3.writeStream.trigger(processingTime="1 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
+
+# Question 2.1
+dfq2_1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
+window = Window.partitionBy(dfq2_1["Origin"]).orderBy(dfq2_1["avg(DepDelay)"])
+dfq2_1 = dfq2_1.select("*", rank().over(window).alias("rank")) \
+        .filter(col("rank")<=10).where(dfq2_1["Origin"].isin('SRQ','CMH','JFK','SEA','BOS'))
+
 """
 query3 = (
     dfq2_1.writeStream.trigger(processingTime="5 seconds") \
@@ -99,6 +101,75 @@ query3 = (
     .start()
 )
 """
+
+# Question 2.3
+
+
+
+# Question 2.4
+dfq2_4 = df.groupby("Origin", "Dest").agg(mean("ArrDelay")) \
+            .filter(concat(col("Origin"),col("Dest")) \
+            .isin("LGABOS","BOSLGA","OKCDFW","MSPATL")).show()
+query5 = (
+    dfq2_4.writeStream.trigger(processingTime="5 seconds") \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+# Question 3.2
+dfnew = df.withColumn("CRSDepTime", lpad(df["CRSDepTime"],4,"0"))
+df1 = dfnew.filter(col("CRSDepTime")<"1200") & (col("FlightDate").substr(1,4)=="2008"))
+df1 = df1.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), \
+                col("ArrDelay"), \ 
+                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), \
+                to_date(col("FlightDate"), "yyyy-MM-dd").alias("Date"))
+df1 = df1.alias("l")
+dfgroupby1 = df1.groupBy("Origin", "Dest", "Date").agg({"ArrDelay":"min"}).alias("ll")
+cond = [col("l.Origin")==col("ll.Origin"),
+        col("l.Dest")==col("ll.Dest"),
+        col("l.Date")==col("ll.Date"),
+        col("l.ArrDelay")==col("ll.min(ArrDelay)")
+        ]
+df1 = df1.join(dfgroupby1, cond, "inner")
+
+
+df2 = dfnew.filter(col("CRSDepTime")>"1200") & (col("FlightDate").substr(1,4)=="2008"))
+df2 = df2.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), \
+                col("ArrDelay"), \ 
+                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), \
+                to_date(col("FlightDate"), "yyyy-MM-dd").alias("Date"))
+df2 = df2.alias("r")
+dfgroupby2 = df2.groupBy("Origin", "Dest", "Date").agg({"ArrDelay":"min"}).alias("rr")
+cond = [col("r.Origin")==col("rr.Origin"),
+        col("r.Dest")==col("rr.Dest"),
+        col("r.Date")==col("rr.Date"),
+        col("r.ArrDelay")==col("rr.min(ArrDelay)")
+        ]
+df2 = df2.join(dfgroupby2, cond, "inner")
+
+
+cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
+dfjoin = df1.join(df2, cond)
+
+df3 = dfjoin.select("l.Origin", "l.Dest","l.Flight", \
+                    date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
+                    "l.ArrDelay", "r.Origin", "r.Dest","r.Flight", \
+                    date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
+                    "r.ArrDelay", \
+                    (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) \
+            .limit(20)
+query6 = (
+    df3.writeStream.trigger(processingTime="5 seconds") \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+
 stop_stream_query(query1, 10)
 stop_stream_query(query2, 10)
 #stop_stream_query(query3, 10)
+#stop_stream_query(query4, 10)
+stop_stream_query(query5, 10)
+stop_stream_query(query6, 10)
