@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode
 from pyspark.sql.functions import split
 
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
+#os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
 findspark.init()
 
 spark = SparkSession \
@@ -19,14 +19,17 @@ df = spark \
   .option("subscribe", "my-topic") \
   .option("startingOffsets", "earliest") \
   .load()
-
 #.option("kafka.group.id", "str-test") \
+
+#df.isStreaming()
+df.printSchema()
+
 
 df = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
 query = (
-    df.writeStream \
-    .outputMode("complete") \
+    df.writeStream.trigger(processingTime = "1 seconds") \
+    .outputMode("append").option("truncate", "false") \
     .format("console") \
     .start()
 )

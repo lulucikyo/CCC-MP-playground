@@ -5,7 +5,10 @@ from kafka import KafkaAdminClient, KafkaConsumer, KafkaProducer
 from kafka.admin import NewTopic
 
 producer = KafkaProducer(bootstrap_servers=['b-1.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094','b-2.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094','b-3.mp2.uhzy0o.c3.kafka.us-east-1.amazonaws.com:9094'],
-                         security_protocol="SSL",
+                         security_protocol="SASL_SSL",
+                         sasl_mechanism = "SCRAM-SHA-512",
+                         sasl_plain_username = "abc",
+                         sasl_plain_password = "abc",
                          value_serializer = lambda x: dumps(x).encode('utf-8'))
 
 f = open("short.csv", "r")
