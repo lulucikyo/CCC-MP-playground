@@ -31,6 +31,7 @@ spark = SparkSession \
     .builder \
     .appName("MP2") \
     .getOrCreate()
+spark.sparkContext.setLogLevel("ERROR")
 
 df = spark \
   .readStream \
