@@ -1,8 +1,10 @@
 import findspark
 import os
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import explode
-from pyspark.sql.functions import split
+import pyspark
+
+from pyspark.sql import *
+from pyspark.sql.types import *
+from pyspark.sql.functions import from_json
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
 findspark.init()
@@ -24,8 +26,23 @@ df = spark \
 #df.isStreaming()
 df.printSchema()
 
+df = df.selectExpr("CAST(value AS STRING)")
 
-df = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+schema = StructType([StructField("DayofWeek", StringType(), True),
+                    StructField("FlightDate", StringType(), True),
+                    StructField("UniqueCarrier", StringType(), True),
+                    StructField("FlightNum", StringType(), True),
+                    StructField("Origin", StringType(), True),
+                    StructField("Dest", StringType(), True),
+                    StructField("CRSDepTime", StringType(), True),
+                    StructField("DepTime", StringType(), True),
+                    StructField("DepDelay", StringType(), True),
+                    StructField("CRSArrTime", StringType(), True),
+                    StructField("ArrTime", StringType(), True),
+                    StructField("ArrDelay", StringType(), True)
+                    ])
+
+df = df.select(from_json(df.value, schema).alias("json"))
 
 query = (
     df.writeStream.trigger(processingTime = "1 seconds") \
