@@ -1,10 +1,28 @@
 import findspark
 import os
 import pyspark
+import time
 
 from pyspark.sql import *
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
+from pyspark.sql.window import Window
+import boto3
+
+
+def stop_stream_query(query, wait_time):
+    while query.isActive:
+        msg = query.status['message']
+        data_avail = query.status['isTriggerActive']
+        trigger_active = query.status['isTriggerActive']
+        if not data_avail and not trigger_active and msg!='Initializing sources':
+            print('Stopping query')
+            query.stop()
+        time.sleep(0.5)
+    print("Awaiting Termination ...")
+    query.awaitTermination(wait_time)
+
+client = boto3.client("dynamodb", region_name="us-east-1")
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
 findspark.init()
@@ -45,16 +63,19 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
 df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
-dfq2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
+dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
         .limit(10)
+dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
+        .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
+
 
 query = (
-    dfq2.writeStream \
+    dfq2.writeStream.trigger(processingTime="10 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
 
 
-query.awaitTermination(5)
+stop_stream_query(query, 10)

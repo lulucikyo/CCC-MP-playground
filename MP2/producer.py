@@ -26,7 +26,7 @@ for line in f:
             'CRSArrTime':v[9],
             'ArrTime':v[10],
             'ArrDelay':v[11]}
-    producer.send('test', value = data)
+    producer.send('alldata', value = data)
     count += 1
     if count % 10000==0:
         print("Sent {} records".format(count))
