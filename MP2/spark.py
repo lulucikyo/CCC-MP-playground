@@ -119,10 +119,10 @@ query5 = (
 
 # Question 3.2
 dfnew = df.withColumn("CRSDepTime", lpad(df["CRSDepTime"],4,"0"))
-df1 = dfnew.filter(col("CRSDepTime")<"1200") & (col("FlightDate").substr(1,4)=="2008"))
-df1 = df1.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), \
-                col("ArrDelay"), \ 
-                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), \
+df1 = dfnew.filter((col("CRSDepTime")<"1200") & (col("FlightDate").substr(1,4)=="2008"))
+df1 = df1.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), 
+                col("ArrDelay"), 
+                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), 
                 to_date(col("FlightDate"), "yyyy-MM-dd").alias("Date"))
 df1 = df1.alias("l")
 dfgroupby1 = df1.groupBy("Origin", "Dest", "Date").agg({"ArrDelay":"min"}).alias("ll")
@@ -134,10 +134,10 @@ cond = [col("l.Origin")==col("ll.Origin"),
 df1 = df1.join(dfgroupby1, cond, "inner")
 
 
-df2 = dfnew.filter(col("CRSDepTime")>"1200") & (col("FlightDate").substr(1,4)=="2008"))
-df2 = df2.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), \
-                col("ArrDelay"), \ 
-                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), \
+df2 = dfnew.filter((col("CRSDepTime")>"1200") & (col("FlightDate").substr(1,4)=="2008"))
+df2 = df2.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), 
+                col("ArrDelay"), 
+                to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), 
                 to_date(col("FlightDate"), "yyyy-MM-dd").alias("Date"))
 df2 = df2.alias("r")
 dfgroupby2 = df2.groupBy("Origin", "Dest", "Date").agg({"ArrDelay":"min"}).alias("rr")
