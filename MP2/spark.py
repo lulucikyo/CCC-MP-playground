@@ -70,12 +70,19 @@ dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
 
 
-query = (
-    dfq2.writeStream.trigger(processingTime="10 seconds") \
+query1 = (
+    dfq1_2.writeStream.trigger(processingTime="5 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
 
+query2 = (
+    dfq1_3.writeStream.trigger(processingTime="5 seconds") \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
 
-stop_stream_query(query, 10)
+stop_stream_query(query1, 10)
+stop_stream_query(query2, 10)
