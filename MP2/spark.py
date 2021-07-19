@@ -91,13 +91,14 @@ query2 = (
     .format("console") \
     .start()
 )
-
+"""
 query3 = (
     dfq2_1.writeStream.trigger(processingTime="5 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
+"""
 stop_stream_query(query1, 10)
 stop_stream_query(query2, 10)
-stop_stream_query(query3, 10)
+#stop_stream_query(query3, 10)
