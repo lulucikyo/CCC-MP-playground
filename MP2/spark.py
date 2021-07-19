@@ -51,11 +51,10 @@ dfq2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
 
 query = (
     dfq2.writeStream \
-    .outputMode("append").option("truncate", "false") \
+    .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
-
 
 
 query.awaitTermination()
