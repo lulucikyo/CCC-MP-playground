@@ -97,14 +97,14 @@ df2.printSchema()
 
 query6_1 = (
     df1.writeStream \
-    .outputMode("complete").option("truncate", "true") \
+    .outputMode("append").option("truncate", "true") \
     .format("console") \
     .start()
 )
 
 query6_2 = (
     df2.writeStream \
-    .outputMode("complete").option("truncate", "true") \
+    .outputMode("append").option("truncate", "true") \
     .format("console") \
     .start()
 )
