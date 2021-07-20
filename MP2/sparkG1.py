@@ -22,12 +22,6 @@ def stop_stream_query(query, wait_time):
     print("Awaiting Termination ...")
     query.awaitTermination(wait_time)
 
-def foreach_batch_f(bdf, batch_id):
-    print("batch id:{}".format(batch_id))
-    bdf.persist()
-    bdf.write.format("console").mode("append").save()
-    bdf.unpersist()
-
 #client = boto3.client("dynamodb", region_name="us-east-1")
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
@@ -37,7 +31,7 @@ spark = SparkSession \
     .builder \
     .appName("MP2") \
     .getOrCreate()
-spark.sparkContext.setLogLevel("ERROR")
+spark.sparkContext.setLogLevel("INFO")
 
 df = spark \
   .readStream \
