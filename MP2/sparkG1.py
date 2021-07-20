@@ -1,13 +1,10 @@
-#import findspark
 import os
-import pyspark
 import time
 
 from pyspark.sql import *
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
-#import boto3
 
 
 def stop_stream_query(query, wait_time):
@@ -22,22 +19,18 @@ def stop_stream_query(query, wait_time):
     print("Awaiting Termination ...")
     query.awaitTermination(wait_time)
 
-#client = boto3.client("dynamodb", region_name="us-east-1")
-
-#os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
-#findspark.init()
-
 spark = SparkSession \
     .builder \
     .appName("MP2") \
     .getOrCreate()
-spark.sparkContext.setLogLevel("INFO")
+
+spark.sparkContext.setLogLevel("ERROR")
 
 df = spark \
   .readStream \
   .format("kafka") \
   .option("kafka.bootstrap.servers", "b-1.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092") \
-  .option("subscribe", "test") \
+  .option("subscribe", "alldata") \
   .option("startingOffsets", "earliest") \
   .load()
 #.option("kafka.group.id", "str-test") \
@@ -86,5 +79,5 @@ query2 = (
 )
 
 
-stop_stream_query(query1, 10)
-stop_stream_query(query2, 10)
+stop_stream_query(query1, 5)
+stop_stream_query(query2, 5)
