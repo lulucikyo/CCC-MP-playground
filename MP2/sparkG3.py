@@ -104,16 +104,17 @@ def foreach_batch_function(dff, batch_id):
     dfjoin = df1.join(df2, cond, "inner")
 
     df3 = dfjoin.select(col("l.Origin").alias("l.Origin"), col("l.Dest").alias("l.Dest"), col("l.Flight").alias("l.Flight"), \
-                        date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
+                        col("l.CRSDep").alias("l.CRSDep"), \
                         col("l.ArrDelay").alias("l.ArrDelay"), \
                         col("r.Origin").alias("r.Origin"), col("r.Dest").alias("r.Dest"), col("r.Flight").alias("r.Flight"), \
-                        date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
+                        col("r.CRSDep").alias("r.CRSDep"), \
                         col("r.ArrDelay").alias("r.ArrDelay"), \
                         (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
-
+                        #date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
+                        #date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
     df3.show(10)
-    #df3.where((col("l.Origin")=='ORD') & (col("l.Dest")=='MSY') & (col("r.Dest")=='STL') & (col("l.CRSDep").contains("14/09/2008"))).show()
-    df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='SAT') and (l.CRSDep LIKE '%14/09/2008%')").show()
+    df3.where((col("l.Origin")=='ORD') & (col("l.Dest")=='MSY') & (col("r.Dest")=='STL') & (month(col("l.CRSDep"))==9) & (dayofmonth(col("l.CRSDep"))==14)).show()
+    #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='SAT') and (l.CRSDep LIKE '%14/09/2008%')").show()
     #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='ORD') and (l.CRSDep LIKE '%14/09/2008')").show()
     #df3_4 = df3.where("l.Origin=='LAX' and l.Dest=='MIA' and r.Dest=='LAX' and l.CRSDep LIKE '%16/05/2008'").show()
 
