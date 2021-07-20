@@ -60,14 +60,13 @@ df = df.select(col("json.*"))
 
 ## DynamoDB
 
-def sentToDynamo(df):
+def sentToDynamo(entry):
     client = boto3.client('dynamodb', region_name='us-east-1')
-    for entry in df.rdd.collect():
-        client.put_item(
+    client.put_item(
             TableName="test",
             Item = {
-                "airport":{"S":entry[0]+"-"+entry[1]},
-                "avgDelay":{"N":str(entry[2])}
+                "airport":{"S":entry["Origin"]+"-"+entry["UniqueCarrier"]},
+                "avgDelay":{"N":str(entry["avg(DepDelay)"])}
             })
 
 # Question 2.1
