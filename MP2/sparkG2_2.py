@@ -23,7 +23,7 @@ def stop_stream_query(query, wait_time):
 
 spark = SparkSession \
     .builder \
-    .appName("MP2") \
+    .appName("MP2-G2_2") \
     .getOrCreate()
 spark.sparkContext.setLogLevel("ERROR")
 
@@ -59,31 +59,54 @@ df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
 
-# Question 2.1
-dfq1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
-dfq1_1 = dfq1.where(col("Origin")=='SRQ').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_2 = dfq1.where(col("Origin")=='CMH').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_3 = dfq1.where(col("Origin")=='JFK').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_4 = dfq1.where(col("Origin")=='SEA').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_5 = dfq1.where(col("Origin")=='BOS').orderBy(col("avg(DepDelay)")).limit(10)
+# Question 2.2
+dfq2 = df.groupby("Origin", "Dest").agg(mean("DepDelay"))
+dfq1_1 = dfq2.where(col("Origin")=='SRQ').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_2 = dfq2.where(col("Origin")=='CMH').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_3 = dfq2.where(col("Origin")=='JFK').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_4 = dfq2.where(col("Origin")=='SEA').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_5 = dfq2.where(col("Origin")=='BOS').orderBy(col("avg(DepDelay)")).limit(10)
 
-"""
-query3 = (
-    dfq2_1.writeStream.trigger(processingTime="5 seconds") \
+query1 = (
+    dfq1_1.writeStream \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
     .start()
 )
-"""
 
-# Question 2.3
+query2 = (
+    dfq1_2.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
 
+query3 = (
+    dfq1_3.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+query4 = (
+    dfq1_4.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+query5 = (
+    dfq1_5.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
 
 
 # Question 2.4
 dfq2_4 = df.groupby("Origin", "Dest").agg(mean("ArrDelay")) \
             .filter(concat(col("Origin"),col("Dest")).isin("LGABOS","BOSLGA","OKCDFW","MSPATL"))
-query5 = (
+query6 = (
     dfq2_4.writeStream.trigger(processingTime="5 seconds") \
     .outputMode("complete").option("truncate", "false") \
     .format("console") \
@@ -91,6 +114,9 @@ query5 = (
 )
 
 
-#stop_stream_query(query3, 10)
-#stop_stream_query(query4, 10)
-stop_stream_query(query5, 10)
+stop_stream_query(query1, 5)
+stop_stream_query(query2, 5)
+stop_stream_query(query3, 5)
+stop_stream_query(query4, 5)
+stop_stream_query(query5, 5)
+stop_stream_query(query6, 5)
