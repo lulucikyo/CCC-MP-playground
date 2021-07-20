@@ -58,43 +58,6 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
 df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
-
-# Question 2.1
-dfq1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
-dfq1_1 = dfq1.where(col("Origin")=='SRQ').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_2 = dfq1.where(col("Origin")=='CMH').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_3 = dfq1.where(col("Origin")=='JFK').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_4 = dfq1.where(col("Origin")=='SEA').orderBy(col("avg(DepDelay)")).limit(10)
-dfq1_5 = dfq1.where(col("Origin")=='BOS').orderBy(col("avg(DepDelay)")).limit(10)
-
-"""
-query3 = (
-    dfq2_1.writeStream.trigger(processingTime="5 seconds") \
-    .outputMode("complete").option("truncate", "false") \
-    .format("console") \
-    .start()
-)
-"""
-
-# Question 2.3
-
-
-
-# Question 2.4
-dfq2_4 = df.groupby("Origin", "Dest").agg(mean("ArrDelay")) \
-            .filter(concat(col("Origin"),col("Dest")).isin("LGABOS","BOSLGA","OKCDFW","MSPATL"))
-query5 = (
-    dfq2_4.writeStream.trigger(processingTime="5 seconds") \
-    .outputMode("complete").option("truncate", "false") \
-    .format("console") \
-    .start()
-)
-
-
-#stop_stream_query(query3, 10)
-#stop_stream_query(query4, 10)
-stop_stream_query(query5, 10)
-
 # Question 3.2
 dfnew = df.withColumn("CRSDepTime", lpad(df["CRSDepTime"],4,"0"))
 df1 = dfnew.filter((col("CRSDepTime")<"1200") & (col("FlightDate").substr(1,4)=="2008"))
@@ -170,11 +133,7 @@ query6_4 = (
     .start()
 )
 """
-stop_stream_query(query1, 10)
-stop_stream_query(query2, 10)
-#stop_stream_query(query3, 10)
-#stop_stream_query(query4, 10)
-stop_stream_query(query5, 10)
+
 stop_stream_query(query6_1, 10)
 stop_stream_query(query6_2, 10)
 stop_stream_query(query6_3, 10)
