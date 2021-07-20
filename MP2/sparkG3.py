@@ -103,11 +103,12 @@ def foreach_batch_function(dff, batch_id):
     cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
     dfjoin = df1.join(df2, cond, "inner")
 
-    df3 = dfjoin.select("l.Origin", "l.Dest","l.Flight", \
+    df3 = dfjoin.select(col("l.Origin").alias("l.Origin"), col("l.Dest").alias("l.Dest"), col("l.Flight").alias("l.Flight"), \
                         date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
-                        "l.ArrDelay", "r.Origin", "r.Dest","r.Flight", \
+                        col("l.ArrDelay").alias("l.ArrDelay"), \
+                        col("r.Origin").alias("r.Origin"), col("r.Dest").alias("r.Dest"), col("r.Flight").alias("r.Flight"), \
                         date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
-                        "r.ArrDelay", \
+                        col("r.ArrDelay").alias("r.ArrDelay"), \
                         (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
 
     df3.show(10)
