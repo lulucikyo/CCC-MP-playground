@@ -24,8 +24,9 @@ def stop_stream_query(query, wait_time):
 
 def foreach_batch_f(bdf, batch_id):
     print("batch id:{}".format(batch_id))
+    bdf.persist()
     bdf.write.format("console").mode("append").save()
-
+    bdf.unpersist()
 
 client = boto3.client("dynamodb", region_name="us-east-1")
 
@@ -75,7 +76,7 @@ dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .limit(10)
 
 query1 = (
-    dfq1_2.writeStream.trigger(processingTime="1 seconds") \
+    dfq1_2.writeStream \
     .outputMode("complete").option("truncate", "false") \
     .foreachBatch(foreach_batch_f).format("console") \
     .start()
@@ -86,9 +87,9 @@ dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
 
 query2 = (
-    dfq1_3.writeStream.trigger(processingTime="1 seconds") \
+    dfq1_3.writeStream \
     .outputMode("complete").option("truncate", "false") \
-    .format("console") \
+    .foreachBatch(foreach_batch_f).format("console") \
     .start()
 )
 
