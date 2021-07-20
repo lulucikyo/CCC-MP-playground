@@ -78,6 +78,7 @@ cond = [col("l.Origin")==col("ll.Origin"),
         col("l.ArrDelay")==col("ll.min(ArrDelay)")
         ]
 df1 = df1.join(dfgroupby1, cond, "inner")
+df1 = df1.alias("l")
 df1.printSchema()
 
 df2 = dfnew.filter(col("CRSDepTime")>"1200")
@@ -93,10 +94,11 @@ cond = [col("r.Origin")==col("rr.Origin"),
         col("r.ArrDelay")==col("rr.min(ArrDelay)")
         ]
 df2 = df2.join(dfgroupby2, cond, "inner")
+df2 = df2.alias("r")
 df2.printSchema()
 
 cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
-dfjoin = df1.join(df2, cond)
+dfjoin = df1.join(df2, cond, "inner")
 
 df3 = dfjoin.select("l.Origin", "l.Dest","l.Flight", \
                     date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
