@@ -29,7 +29,7 @@ spark.sparkContext.setLogLevel("ERROR")
 df = spark \
   .readStream \
   .format("kafka") \
-  .option("kafka.bootstrap.servers", "b-1.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092") \
+  .option("kafka.bootstrap.servers", "b-1.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092") \
   .option("subscribe", "alldata") \
   .option("startingOffsets", "earliest") \
   .load()
