@@ -111,10 +111,10 @@ def foreach_batch_function(dff, batch_id):
                         (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
 
     df3.show(10)
-    # df3_1 = df3.where("l.Origin=='BOS' and l.Dest=='ATL' and r.Dest=='LAX' and l.CRSDep LIKE '%03/04/2008'")
-    #df3_2 = df3.where("l.Origin=='PHX' and l.Dest=='JFK' and r.Dest=='MSP' and l.CRSDep LIKE '%07/09/2008'")
-    #df3_3 = df3.where("l.Origin=='DFW' and l.Dest=='STL' and r.Dest=='ORD' and l.CRSDep LIKE '%24/01/2008'")
-    #df3_4 = df3.where("l.Origin=='LAX' and l.Dest=='MIA' and r.Dest=='LAX' and l.CRSDep LIKE '%16/05/2008'")
+    df3_1 = df3.where("l.Origin=='IAD' and l.Dest=='MSY' and r.Dest=='DEN' and l.CRSDep LIKE '%19/09/2008'").show()
+    df3_2 = df3.where("l.Origin=='IAD' and l.Dest=='MSY' and r.Dest=='IAD' and l.CRSDep LIKE '%19/09/2008'").show()
+    df3_3 = df3.where("l.Origin=='IAD' and l.Dest=='MSY' and r.Dest=='SAT' and l.CRSDep LIKE '%19/09/2008'").show()
+    #df3_4 = df3.where("l.Origin=='LAX' and l.Dest=='MIA' and r.Dest=='LAX' and l.CRSDep LIKE '%16/05/2008'").show()
 
 
 query = (
