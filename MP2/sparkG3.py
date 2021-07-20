@@ -112,8 +112,8 @@ def foreach_batch_function(dff, batch_id):
                         (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
 
     df3.show(10)
-    df3.where((col("l.Origin")=='ORD') & (col("l.Dest")=='MSY') & (col("r.Dest")=='STL') & (col("l.CRSDep").contains("14/09/2008"))).show()
-    #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='SAT') and (l.CRSDep LIKE '%14/09/2008')").show()
+    #df3.where((col("l.Origin")=='ORD') & (col("l.Dest")=='MSY') & (col("r.Dest")=='STL') & (col("l.CRSDep").contains("14/09/2008"))).show()
+    df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='SAT') and (l.CRSDep LIKE '%14/09/2008%')").show()
     #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='ORD') and (l.CRSDep LIKE '%14/09/2008')").show()
     #df3_4 = df3.where("l.Origin=='LAX' and l.Dest=='MIA' and r.Dest=='LAX' and l.CRSDep LIKE '%16/05/2008'").show()
 
