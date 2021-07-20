@@ -43,7 +43,7 @@ df = spark \
   .readStream \
   .format("kafka") \
   .option("kafka.bootstrap.servers", "b-1.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092,b-3.mp2-2.bd6aae.c3.kafka.us-east-1.amazonaws.com:9092") \
-  .option("subscribe", "alldata") \
+  .option("subscribe", "test") \
   .option("startingOffsets", "earliest") \
   .load()
 #.option("kafka.group.id", "str-test") \
@@ -76,9 +76,9 @@ dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .limit(10)
 
 query1 = (
-    dfq1_2.writeStream.foreachBatch(foreach_batch_f).format("console") \
+    dfq1_2.writeStream \
     .outputMode("complete").option("truncate", "false") \
-    .start()
+    .format("console").start()
 )
 
 # Question 1.3
@@ -86,9 +86,9 @@ dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
 
 query2 = (
-    dfq1_3.writeStream.foreachBatch(foreach_batch_f).format("console") \
+    dfq1_3.writeStream \
     .outputMode("complete").option("truncate", "false") \
-    .start()
+    .format("console").start()
 )
 
 
