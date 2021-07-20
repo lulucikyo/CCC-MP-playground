@@ -60,7 +60,7 @@ df = df.select(col("json.*"))
 
 ## DynamoDB
 
-def sentToDynamo(df, batch_id):
+def sentToDynamo(df):
     client = boto3.client('dynamodb', region_name='us-east-1')
     for entry in df.rdd.collect():
         client.put_item(
