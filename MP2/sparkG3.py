@@ -61,7 +61,9 @@ df = df.select(col("json.*"))
 # Question 3.2
 dfnew = df.withColumn("CRSDepTime", lpad(df["CRSDepTime"],4,"0"))
 dfnew = dfnew.filter(col("FlightDate").substr(1,4)=="2008")
-#dfnew = dfnew.withColumn("ArrDelay", col("ArrDelay").cast("double"))
+dfnew = dfnew.withColumn("ArrDelay", col("ArrDelay").cast("double"))
+dfnew.printSchema()
+
 
 df1 = dfnew.filter(col("CRSDepTime")<"1200")
 df1 = df1.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), 

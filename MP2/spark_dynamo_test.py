@@ -59,7 +59,6 @@ df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
 ## DynamoDB
-
 def sentToDynamo(entry):
     client = boto3.client('dynamodb', region_name='us-east-1')
     client.put_item(
