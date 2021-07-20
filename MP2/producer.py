@@ -7,7 +7,7 @@ from kafka.admin import NewTopic
 producer = KafkaProducer(bootstrap_servers=["b-1.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092","b-2.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092"],
                          value_serializer = lambda x: dumps(x).encode('utf-8'))
 
-f = open("short.csv", "r")
+f = open("final_v2.csv", "r")
 f.readline()
 
 count = 0
