@@ -1,4 +1,4 @@
-import findspark
+#import findspark
 import os
 import pyspark
 import time
@@ -7,7 +7,7 @@ from pyspark.sql import *
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
-import boto3
+#import boto3
 
 
 def stop_stream_query(query, wait_time):
@@ -28,7 +28,7 @@ def foreach_batch_f(bdf, batch_id):
     bdf.write.format("console").mode("append").save()
     bdf.unpersist()
 
-client = boto3.client("dynamodb", region_name="us-east-1")
+#client = boto3.client("dynamodb", region_name="us-east-1")
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
 #findspark.init()
