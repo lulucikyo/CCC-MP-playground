@@ -80,7 +80,7 @@ cond = [col("l.Origin")==col("ll.Origin"),
 df1 = df1.join(dfgroupby1, cond, "inner")
 df1.printSchema()
 
-df2 = dfnew.filter(col("CRSDepTime")>"1200")
+"""df2 = dfnew.filter(col("CRSDepTime")>"1200")
 df2 = df2.select(col("Origin"), col("Dest"), concat(col('UniqueCarrier'),lit(" "),col('FlightNum')).alias("Flight"), 
                 col("ArrDelay"), 
                 to_timestamp(concat(col("FlightDate"),col("CRSDepTime")), "yyyy-MM-ddHHmm").alias("CRSDep"), 
@@ -93,7 +93,7 @@ cond = [col("r.Origin")==col("rr.Origin"),
         col("r.ArrDelay")==col("rr.min(ArrDelay)")
         ]
 df2 = df2.join(dfgroupby2, cond, "inner")
-df2.printSchema()
+df2.printSchema()"""
 
 query6_1 = (
     df1.writeStream \
@@ -102,15 +102,15 @@ query6_1 = (
     .start()
 )
 
-query6_2 = (
+"""query6_2 = (
     df2.writeStream \
     .outputMode("append").option("truncate", "true") \
     .format("console") \
     .start()
 )
-
+"""
 stop_stream_query(query6_1, 5)
-stop_stream_query(query6_2, 5)
+"""stop_stream_query(query6_2, 5)"""
 
 """cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
 dfjoin = df1.join(df2, cond, "inner")
