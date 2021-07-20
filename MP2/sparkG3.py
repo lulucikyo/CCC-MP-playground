@@ -95,7 +95,24 @@ cond = [col("r.Origin")==col("rr.Origin"),
 df2 = df2.join(dfgroupby2, cond, "inner")
 df2.printSchema()
 
-cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
+query6_1 = (
+    df1.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+query6_2 = (
+    df2.writeStream \
+    .outputMode("complete").option("truncate", "false") \
+    .format("console") \
+    .start()
+)
+
+stop_stream_query(query6_1, 5)
+stop_stream_query(query6_2, 5)
+
+"""cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
 dfjoin = df1.join(df2, cond, "inner")
 
 df3 = dfjoin.select("l.Origin", "l.Dest","l.Flight", \
@@ -103,8 +120,9 @@ df3 = dfjoin.select("l.Origin", "l.Dest","l.Flight", \
                     "l.ArrDelay", "r.Origin", "r.Dest","r.Flight", \
                     date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
                     "r.ArrDelay", \
-                    (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
+                    (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) """
 
+"""
 df3_1 = df3.where("l.Origin=='BOS' and l.Dest=='ATL' and r.Dest=='LAX' and l.CRSDep LIKE '%03/04/2008'")
 df3_2 = df3.where("l.Origin=='PHX' and l.Dest=='JFK' and r.Dest=='MSP' and l.CRSDep LIKE '%07/09/2008'")
 df3_3 = df3.where("l.Origin=='DFW' and l.Dest=='STL' and r.Dest=='ORD' and l.CRSDep LIKE '%24/01/2008'")
@@ -142,4 +160,4 @@ query6_4 = (
 stop_stream_query(query6_1, 5)
 stop_stream_query(query6_2, 5)
 stop_stream_query(query6_3, 5)
-stop_stream_query(query6_4, 5)
+stop_stream_query(query6_4, 5)"""
