@@ -79,8 +79,6 @@ def foreach_batch_function(dff, batch_id):
             col("l.ArrDelay")==col("ll.min(ArrDelay)")
             ]
     df1 = df1.join(dfgroupby1, cond, "inner")
-    df1.printSchema()
-    df1.show()
 
     #second leg
     df2 = dff.filter(col("CRSDepTime")>"1200")
@@ -96,8 +94,6 @@ def foreach_batch_function(dff, batch_id):
             col("r.ArrDelay")==col("rr.min(ArrDelay)")
             ]
     df2 = df2.join(dfgroupby2, cond, "inner")
-    df2.printSchema()
-    df2.show()
 
     # final join
     cond = [col("l.Dest")==col("r.Origin"), datediff(col("r.CRSDep"), col("l.CRSDep"))==2]
@@ -110,13 +106,12 @@ def foreach_batch_function(dff, batch_id):
                         col("r.CRSDep").alias("r.CRSDep"), \
                         col("r.ArrDelay").alias("r.ArrDelay"), \
                         (col("l.ArrDelay")+col("r.ArrDelay")).alias("TotDelay")) 
-                        #date_format(col("l.CRSDep"),"HH:mm dd/MM/yyyy").alias("l.CRSDep"), \
-                        #date_format(col("r.CRSDep"),"HH:mm dd/MM/yyyy").alias("r.CRSDep"), \
+
     df3.show(10)
-    df3.where((col("l.Origin")=='ORD') & (col("l.Dest")=='MSY') & (col("r.Dest")=='STL') & (month(col("l.CRSDep"))==9) & (dayofmonth(col("l.CRSDep"))==14)).show()
-    #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='SAT') and (l.CRSDep LIKE '%14/09/2008%')").show()
-    #df3.where("(l.Origin=='ORD') and (l.Dest=='MSY') and (r.Dest=='ORD') and (l.CRSDep LIKE '%14/09/2008')").show()
-    #df3_4 = df3.where("l.Origin=='LAX' and l.Dest=='MIA' and r.Dest=='LAX' and l.CRSDep LIKE '%16/05/2008'").show()
+    df3.where((col("l.Origin")=='BOS') & (col("l.Dest")=='ATL') & (col("r.Dest")=='LAX') & (month(col("l.CRSDep"))==4) & (dayofmonth(col("l.CRSDep"))==3)).show()
+    df3.where((col("l.Origin")=='PHX') & (col("l.Dest")=='JFK') & (col("r.Dest")=='MSP') & (month(col("l.CRSDep"))==9) & (dayofmonth(col("l.CRSDep"))==7)).show()
+    df3.where((col("l.Origin")=='DFW') & (col("l.Dest")=='STL') & (col("r.Dest")=='ORD') & (month(col("l.CRSDep"))==1) & (dayofmonth(col("l.CRSDep"))==24)).show()
+    df3.where((col("l.Origin")=='LAX') & (col("l.Dest")=='MIA') & (col("r.Dest")=='LAX') & (month(col("l.CRSDep"))==5) & (dayofmonth(col("l.CRSDep"))==16)).show()
 
 
 query = (
