@@ -31,7 +31,7 @@ def foreach_batch_f(bdf, batch_id):
 client = boto3.client("dynamodb", region_name="us-east-1")
 
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
-findspark.init()
+#findspark.init()
 
 spark = SparkSession \
     .builder \
@@ -76,9 +76,8 @@ dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
         .limit(10)
 
 query1 = (
-    dfq1_2.writeStream \
+    dfq1_2.writeStream.foreachBatch(foreach_batch_f).format("console") \
     .outputMode("complete").option("truncate", "false") \
-    .foreachBatch(foreach_batch_f).format("console") \
     .start()
 )
 
@@ -87,9 +86,8 @@ dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
         .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
 
 query2 = (
-    dfq1_3.writeStream \
+    dfq1_3.writeStream.foreachBatch(foreach_batch_f).format("console") \
     .outputMode("complete").option("truncate", "false") \
-    .foreachBatch(foreach_batch_f).format("console") \
     .start()
 )
 
