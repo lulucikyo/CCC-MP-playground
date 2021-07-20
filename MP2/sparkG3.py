@@ -1,4 +1,3 @@
-import findspark
 import os
 import pyspark
 import time
@@ -6,8 +5,6 @@ import time
 from pyspark.sql import *
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
-from pyspark.sql.window import Window
-import boto3
 
 
 def stop_stream_query(query, wait_time):
@@ -22,10 +19,7 @@ def stop_stream_query(query, wait_time):
     print("Awaiting Termination ...")
     query.awaitTermination(wait_time)
 
-client = boto3.client("dynamodb", region_name="us-east-1")
-
 #os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2'
-findspark.init()
 
 spark = SparkSession \
     .builder \
@@ -64,34 +58,14 @@ schema = StructType([StructField("DayOfWeek", StringType(), True),
 df = df.select(from_json(df.value, schema).alias("json"))
 df = df.select(col("json.*"))
 
-# Question 1.2
-dfq1_2 = df.groupby("UniqueCarrier").agg(mean("ArrDelay")) \
-        .orderBy("avg(ArrDelay)").select("UniqueCarrier", "avg(ArrDelay)") \
-        .limit(10)
-
-query1 = (
-    dfq1_2.writeStream.trigger(processingTime="1 seconds") \
-    .outputMode("complete").option("truncate", "false") \
-    .format("console") \
-    .start()
-)
-
-# Question 1.3
-dfq1_3 = df.groupby("DayOfWeek").agg(mean("ArrDelay")) \
-        .orderBy("avg(ArrDelay)").select("DayOfWeek", "avg(ArrDelay)")
-
-query2 = (
-    dfq1_3.writeStream.trigger(processingTime="1 seconds") \
-    .outputMode("complete").option("truncate", "false") \
-    .format("console") \
-    .start()
-)
 
 # Question 2.1
-dfq2_1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
-window = Window.partitionBy(dfq2_1["Origin"]).orderBy(dfq2_1["avg(DepDelay)"])
-dfq2_1 = dfq2_1.select("*", rank().over(window).alias("rank")) \
-        .filter(col("rank")<=10).where(dfq2_1["Origin"].isin('SRQ','CMH','JFK','SEA','BOS'))
+dfq1 = df.groupby("Origin", "UniqueCarrier").agg(mean("DepDelay"))
+dfq1_1 = dfq1.where(col("Origin")=='SRQ').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_2 = dfq1.where(col("Origin")=='CMH').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_3 = dfq1.where(col("Origin")=='JFK').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_4 = dfq1.where(col("Origin")=='SEA').orderBy(col("avg(DepDelay)")).limit(10)
+dfq1_5 = dfq1.where(col("Origin")=='BOS').orderBy(col("avg(DepDelay)")).limit(10)
 
 """
 query3 = (
@@ -115,6 +89,11 @@ query5 = (
     .format("console") \
     .start()
 )
+
+
+#stop_stream_query(query3, 10)
+#stop_stream_query(query4, 10)
+stop_stream_query(query5, 10)
 
 # Question 3.2
 dfnew = df.withColumn("CRSDepTime", lpad(df["CRSDepTime"],4,"0"))
