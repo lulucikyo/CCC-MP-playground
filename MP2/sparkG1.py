@@ -30,7 +30,7 @@ df = spark \
   .readStream \
   .format("kafka") \
   .option("kafka.bootstrap.servers", "b-1.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092,b-2.mp2-3.bfzneb.c3.kafka.us-east-1.amazonaws.com:9092") \
-  .option("subscribe", "alldata") \
+  .option("subscribe", "test") \
   .option("startingOffsets", "earliest") \
   .load()
 #.option("kafka.group.id", "str-test") \
